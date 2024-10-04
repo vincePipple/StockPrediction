@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
 
 
 def fetch_stock_data(ticker: str, period = '1y', interval = '1d') -> pd.DataFrame:
@@ -38,3 +39,18 @@ def preprocess_stock_data(data: pd.DataFrame) -> pd.DataFrame:
 
     return data
 
+def train_and_predict(data: pd.DataFrame) -> int:
+    data = preprocess_stock_data(data)
+    data.reset_index(inplace=True)
+
+    X = data[['MA10', 'Pct_Change']]
+    y = data['Close']
+
+    model = RandomForestRegressor()
+    model.fit(X,y)
+
+    X_latest = pd.DataFrame([X.iloc[-1]], columns=X.columns)
+
+    prediction = model.predict(X_latest)
+
+    return prediction[0]

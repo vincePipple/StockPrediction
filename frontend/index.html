@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Price Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        .prediction-container {
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            max-width: 500px;
+        }
+        p {
+            font-size: 18px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Stock Price Predictions</h1>
+    
+    <!-- Input for the Stock Ticker -->
+    <div>
+        <label for="ticker">Enter Stock Ticker: </label>
+        <input type="text" id="ticker" placeholder="e.g., AAPL, TSLA">
+        <button onclick="fetchPrediction()">Get Prediction</button>
+    </div>
+
+    <br>
+
+    <div id="prediction-result" class="prediction-container">
+        <!-- Data from the API will be inserted here -->
+    </div>
+
+    <script>
+        function fetchPrediction() {
+            // Get the stock ticker from the input
+            const ticker = document.getElementById('ticker').value.toUpperCase();
+
+            if (!ticker) {
+                alert("Please enter a valid stock ticker!");
+                return;
+            }
+
+            // URL for the API with the stock ticker
+            const apiUrl = `http://127.0.0.1:8000/predict/${ticker}`;
+
+            // Fetching data from the API
+            fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Invalid stock ticker or an error occurred.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                const container = document.getElementById('prediction-result');
+                
+                // If there is an error, display it
+                if (data.error) {
+                    container.innerHTML = `<p><strong>Error:</strong> ${data.error}</p>`;
+                    return;
+                }
+
+                // Displaying the data dynamically in the div
+                container.innerHTML = `
+                    <p><strong>Ticker:</strong> ${data.ticker}</p>
+                    <p><strong>Predicted Closing Price (using RandomForest):</strong> ${data['predicted closing price (using RandomForest)']}</p>
+                    <p><strong>Predicted Closing Price (using LinearRegression):</strong> ${data['predicted closing price (using LinearRegression)']}</p>
+                `;
+            })
+            .catch(error => {
+                // Handle fetch errors
+                const container = document.getElementById('prediction-result');
+                container.innerHTML = `<p><strong>Error:</strong> ${error.message}</p>`;
+                console.error('Error fetching data:', error);
+            });
+        }
+    </script>
+
+</body>
+</html>

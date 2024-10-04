@@ -1,9 +1,10 @@
 import yfinance as yf
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
 
 
-def fetch_stock_data(ticker: str, period = '1y', interval = '1d') -> pd.DataFrame:
+def fetch_stock_data(ticker: str, period: str, interval: str) -> pd.DataFrame:
     """
     Retrieving stock data
 
@@ -28,7 +29,7 @@ def preprocess_stock_data(data: pd.DataFrame) -> pd.DataFrame:
     Calculates percentage change for closing prices
 
     Args:
-        data: Pandas data frame with stock data
+        data: Pandas dataframe with stock data
     """
     data = data.dropna()
 
@@ -40,17 +41,26 @@ def preprocess_stock_data(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 def train_and_predict(data: pd.DataFrame) -> int:
+    """
+    Trains a machine learning model and makes a prediction for today's closing price
+
+    Args:
+        data: Pandas dataframe containing stock information
+    """
     data = preprocess_stock_data(data)
     data.reset_index(inplace=True)
 
     X = data[['MA10', 'Pct_Change']]
     y = data['Close']
 
-    model = RandomForestRegressor()
-    model.fit(X,y)
+    model_one = RandomForestRegressor()
+    model_two = LinearRegression()
+    model_one.fit(X,y)
+    model_two.fit(X,y)
 
     X_latest = pd.DataFrame([X.iloc[-1]], columns=X.columns)
 
-    prediction = model.predict(X_latest)
+    prediction_one = model_one.predict(X_latest)
+    prediction_two = model_two.predict(X_latest)
 
-    return prediction[0]
+    return prediction_one[0], prediction_two[0]

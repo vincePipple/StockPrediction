@@ -1,6 +1,5 @@
 from joblib import dump
 import pandas as pd
-import uvicorn
 
 import os
 import sys
@@ -30,16 +29,17 @@ def predict_stock_price(ticker:str):
     
     """
     try:
-        data = fetch_stock_data(ticker, period = '1y', interval = '1d')
+        data = fetch_stock_data(ticker, period = '5y', interval = '1d')
 
         if data is None or data.empty:
             raise HTTPException(status_code=400, detail="Invalid stock ticker")
         
-        prediction = train_and_predict(data = data)
+        prediction_one, prediction_two = train_and_predict(data = data)
 
         return {
             "ticker": ticker, 
-            "predicted_close_price": prediction
+            "predicted closing price (using RandomForest)": prediction_one,
+            "predicted closing price (using LinearRegression)": prediction_two
         }
     except Exception as e:
         return {"error": str(e)}

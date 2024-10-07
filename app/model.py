@@ -22,7 +22,6 @@ def fetch_stock_data(ticker: str, period: str, interval: str) -> pd.DataFrame:
 
     return stock_data
 
-
 def preprocess_stock_data(data: pd.DataFrame) -> pd.DataFrame:
     """
     Calculates moving average with a time window of 10 days 
